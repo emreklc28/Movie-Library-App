@@ -25,6 +25,8 @@ type RootStackParamList = {
   Details: {movie: any};
 };
 
+const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+
 const FavScreen = () => {
   const {favorites, toggleFavorite, isFavorite} = useFavorites();
   const {genres} = useMovies();
@@ -183,39 +185,51 @@ const FavScreen = () => {
             </View>
           )}
 
-          <FlatList
-            data={filteredFavorites}
-            keyExtractor={item => item.id.toString()}
-            contentContainerStyle={styles.listContentContainer}
-            renderItem={({item}) => (
-              <TouchableOpacity
-                style={styles.card}
-                onPress={() => navigation.navigate('Details', {movie: item})}>
-                <DynamicImage
-                  width={100}
-                  uri={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
-                />
-                <View style={styles.info}>
-                  <Text style={styles.title}>{item.title}</Text>
-                </View>
-                {/* Kalp ikonu toggle ekledim */}
+          {filteredFavorites.length === 0 ? (
+            <View style={[styles.center, {backgroundColor: colors.black}]}>
+              <Text style={styles.nNFountFav}>
+                No favorite movies found matching your search
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={filteredFavorites}
+              keyExtractor={item => item.id.toString()}
+              contentContainerStyle={styles.listContentContainer}
+              renderItem={({item}) => (
                 <TouchableOpacity
-                  onPress={() =>
-                    toggleFavorite({
-                      ...item,
-                      genre_ids: item.genre_ids || [],
-                    })
-                  }
-                  style={{padding: 8, position: 'absolute', right: 10, top: 10,}}>
-                  <Ionicons
-                    name={isFavorite(item.id) ? 'heart' : 'heart-outline'}
-                    size={24}
-                    color={isFavorite(item.id) ? 'red' : 'gray'}
+                  style={styles.card}
+                  onPress={() => navigation.navigate('Details', {movie: item})}>
+                  <DynamicImage
+                    width={100}
+                    uri={`${IMAGE_BASE_URL}${item.poster_path}`}
                   />
+                  <View style={styles.info}>
+                    <Text style={styles.title}>{item.title}</Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() =>
+                      toggleFavorite({
+                        ...item,
+                        genre_ids: item.genre_ids || [],
+                      })
+                    }
+                    style={{
+                      padding: 8,
+                      position: 'absolute',
+                      right: 10,
+                      top: 10,
+                    }}>
+                    <Ionicons
+                      name={isFavorite(item.id) ? 'heart' : 'heart-outline'}
+                      size={24}
+                      color={isFavorite(item.id) ? 'red' : 'gray'}
+                    />
+                  </TouchableOpacity>
                 </TouchableOpacity>
-              </TouchableOpacity>
-            )}
-          />
+              )}
+            />
+          )}
         </View>
       </KeyboardAvoidingView>
     </>
@@ -229,10 +243,10 @@ const styles = StyleSheet.create({
   },
   listContentContainer: {
     paddingHorizontal: 16,
-    marginTop:10,
+    marginTop: 10,
   },
   center: {
-    backgroundColor:colors.red,
+    backgroundColor: colors.red,
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -271,7 +285,7 @@ const styles = StyleSheet.create({
   },
   genreButtonActive: {
     backgroundColor: colors.red,
-    fontWeight:'bold',
+    fontWeight: 'bold',
   },
   genreButtonText: {
     color: colors.red,
@@ -295,7 +309,12 @@ const styles = StyleSheet.create({
   },
 
   selectedFilterText: {
-    color:colors.black,
+    color: colors.black,
+    fontWeight: 'bold',
+  },
+  nNFountFav: {
+    color: colors.yellow,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   card: {
@@ -322,7 +341,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 4,
   },
-  ratingContainer:{
+  ratingContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },

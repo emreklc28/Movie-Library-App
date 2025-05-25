@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, Alert, StyleSheet} from 'react-native';
+import {View, Text, Alert, StyleSheet, TouchableOpacity} from 'react-native';
 import {signInWithEmailAndPassword} from 'firebase/auth';
 import Button from '../components/Button';
 import InputField from '../components/InputField';
@@ -39,7 +39,7 @@ const LoginScreen = () => {
     } catch (error: any) {
       Alert.alert(
         'Giriş Başarısız',
-        'Hatalı kullanıcı veya şifre hatalı',
+        'Hatalı email veya şifre',
       );
     }
   };
@@ -62,11 +62,13 @@ const LoginScreen = () => {
         keyboardType="default"
       />
       <Button title="Login" onPress={handleLogin} />
-      <Text
-        onPress={() => navigation.navigate('Register')}
-        style={styles.registerText}>
-        Hesabınız yok mu? Kayıt Olun
-      </Text>
+
+      <View style={styles.registerTextContainer}>
+        <Text style={styles.text}>Hesabınız yok mu? </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+          <Text style={styles.registerText}>Kayıt Olun</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -79,10 +81,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.black,
     justifyContent: 'center',
   },
-  registerText: {
+  registerTextContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
     marginTop: 20,
+  },
+  text: {
     fontSize: 25,
     color: colors.red,
-    textAlign: 'center',
+  },
+  registerText: {
+    fontSize: 25,
+    color: colors.white,
+    fontWeight: 'bold',
   },
 });

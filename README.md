@@ -75,3 +75,9 @@ yarn install
 npx react-native run-android
 # veya
 npx react-native run-ios
+
+
+## Accounts:   id: patika@gmail.com password: patika
+## Accounts:   id: emre@gmail.com password: emre123
+
+
