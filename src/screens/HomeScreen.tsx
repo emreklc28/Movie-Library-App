@@ -19,7 +19,7 @@ type RootStackParamList = {
   Details: {movie: any};
 };
 
-const HomeScreenContent = () => {
+const HomeScreen = () => {
   const {movies, isLoading, loadMoreMovies, refreshMovies} = useMovies();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -68,7 +68,7 @@ const HomeScreenContent = () => {
   };
 
   return (
-    <>
+    <React.Fragment>
       <Header />
       <FlatList
         data={Array.from(
@@ -84,19 +84,15 @@ const HomeScreenContent = () => {
         showsVerticalScrollIndicator={false}
         ListFooterComponent={
           isLoading ? (
-            <ActivityIndicator size="small" color={colors.red} style={styles.footerLoader} />
+            <ActivityIndicator
+              size="small"
+              color={colors.red}
+              style={styles.footerLoader}
+            />
           ) : null
         }
       />
-    </>
-  );
-};
-
-const HomeScreen = () => {
-  return (
-    <HeaderProvider>
-      <HomeScreenContent />
-    </HeaderProvider>
+    </React.Fragment>
   );
 };
 
@@ -107,7 +103,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.black,
+    backgroundColor: colors.red,
   },
   container: {
     paddingVertical: 12,
@@ -139,12 +135,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: colors.yellow,
+    color: colors.paleYellow,
     marginBottom: 8,
     flexWrap: 'wrap',
   },
   year: {
     fontSize: 14,
-    color: colors.yellow,
+    color: colors.paleYellow,
   },
 });

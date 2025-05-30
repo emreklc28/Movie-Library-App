@@ -8,8 +8,8 @@ import {
   ActivityIndicator,
   FlatList,
   TouchableOpacity,
-  Pressable,
   Dimensions,
+  SafeAreaView,
 } from 'react-native';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -36,6 +36,27 @@ type CastMember = {
 const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 const DOUBLE_TAP_DELAY = 300;
 
+const CastItem = ({item}: {item: CastMember}) => (
+  <View style={styles.castItem}>
+    {item.profile_path ? (
+      <Image
+        source={{uri: `${IMAGE_BASE_URL}${item.profile_path}`}}
+        style={styles.castImage}
+      />
+    ) : (
+      <View style={[styles.castImage, styles.noImage]}>
+        <Text>No Image</Text>
+      </View>
+    )}
+    <Text style={styles.castName} numberOfLines={1}>
+      {item.name}
+    </Text>
+    <Text style={styles.castCharacter} numberOfLines={1}>
+      {item.character}
+    </Text>
+  </View>
+);
+
 const DetailsScreenContent = () => {
   const route = useRoute<DetailsRouteProp>();
   const {movie} = route.params;
@@ -51,7 +72,7 @@ const DetailsScreenContent = () => {
   const lastTap = useRef<number | null>(null);
 
   const handleDoubleTap = () => {
-    if (!details){
+    if (!details) {
       return;
     }
     toggleFavorite({
@@ -84,17 +105,17 @@ const DetailsScreenContent = () => {
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <SafeAreaView style={styles.center}>
         <ActivityIndicator size="large" />
-      </View>
+      </SafeAreaView>
     );
   }
 
   if (!details) {
     return (
-      <View style={styles.center}>
+      <SafeAreaView style={styles.center}>
         <Text>Film bilgisi bulunamadı.</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
@@ -102,38 +123,15 @@ const DetailsScreenContent = () => {
     ? details.release_date.split('-')[0]
     : 'N/A';
 
-  const renderCastItem = ({item}: {item: CastMember}) => (
-    <View style={styles.castItem}>
-      {item.profile_path ? (
-        <Image
-
-          source={{uri: `${IMAGE_BASE_URL}${item.profile_path}`}}
-          style={styles.castImage}
-        />
-      ) : (
-        <View style={[styles.castImage, styles.noImage]}>
-          <Text>No Image</Text>
-        </View>
-      )}
-      <Text style={styles.castName} numberOfLines={1}>
-        {item.name}
-      </Text>
-      <Text style={styles.castCharacter} numberOfLines={1}>
-        {item.character}
-      </Text>
-    </View>
-  );
-
   return (
-    <>
-      <Header />
+    <React.Fragment>
+      <Header showBackButton={true} />
       <ScrollView contentContainerStyle={styles.container}>
-        <Pressable
+        <DynamicImage
+          uri={`${IMAGE_BASE_URL}${details.poster_path}`}
+          width={screenWidth}
           onPress={onImagePress}
-          style={styles.presseble}>
-
-          <DynamicImage uri={`${IMAGE_BASE_URL}${details.poster_path}`} width={screenWidth} />
-        </Pressable>
+        />
 
         <View style={styles.infoRow}>
           <Text style={styles.ratingYear}>
@@ -159,13 +157,18 @@ const DetailsScreenContent = () => {
         {details.genres && details.genres.length > 0 && (
           <View style={styles.genreContainer}>
             <Text style={styles.genresTitle}>Genres:</Text>
-            <View style={styles.genresList}>
-              {details.genres.map((genre: {id: number; name: string}) => (
-                <View key={genre.id} style={styles.genreBadge}>
-                  <Text style={styles.genreText}>{genre.name}</Text>
+            <FlatList
+              data={details.genres}
+              horizontal
+              keyExtractor={genre => genre.id.toString()}
+              renderItem={({item}) => (
+                <View style={styles.genreBadge}>
+                  <Text style={styles.genreText}>{item.name}</Text>
                 </View>
-              ))}
-            </View>
+              )}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{paddingVertical: 4}}
+            />
           </View>
         )}
 
@@ -188,7 +191,7 @@ const DetailsScreenContent = () => {
             data={cast.slice(0, 20)}
             horizontal
             keyExtractor={item => item.cast_id.toString()}
-            renderItem={renderCastItem}
+            renderItem={({item}) => <CastItem item={item} />}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{paddingVertical: 10}}
           />
@@ -196,14 +199,16 @@ const DetailsScreenContent = () => {
           <Text>Cast bilgisi yok.</Text>
         )}
       </ScrollView>
-    </>
+    </React.Fragment>
   );
 };
 
 const DetailsScreen = () => {
   return (
     <HeaderProvider>
-      <DetailsScreenContent />
+      <SafeAreaView style={styles.safeProvier}>
+        <DetailsScreenContent />
+      </SafeAreaView>
     </HeaderProvider>
   );
 };
@@ -215,9 +220,18 @@ const styles = StyleSheet.create({
   },
   center: {
     flex: 1,
-    backgroundColor:colors.black,
+    backgroundColor: colors.black,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  descriptionContainer: {
+    marginTop: 8,
+    maxHeight: 120,
+    borderWidth: 1,
+    borderColor: colors.gray,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    backgroundColor: colors.darkGrey,
   },
   posterContainer: {
     flex: 1,
@@ -248,7 +262,6 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   description: {
-    marginTop: 8,
     fontSize: 16,
     lineHeight: 22,
     color: colors.white,
@@ -305,20 +318,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   genreText: {
-    fontSize: 14,
     color: colors.white,
+    fontWeight: '600',
+    fontSize: 14,
   },
-  descriptionContainer: {
-    maxHeight: 150,
-    marginTop: 8,
-    borderWidth: 1.5,
-    borderColor: '#aaa',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-  },
-  presseble:{
-    borderRadius: 8,
-    overflow: 'hidden',
+
+  safeProvier: {
+    flex: 1,
+    backgroundColor: colors.black,
   },
 });
 

@@ -7,7 +7,6 @@ import {
   FlatList,
   StyleSheet,
   ActivityIndicator,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -101,13 +100,11 @@ const SearchScreen = () => {
       </View>
     </TouchableOpacity>
   );
-
   return (
     <KeyboardAvoidingView
       style={styles.screen}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
-    >
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
       <SearchFilterToggles
         showSearch={showSearch}
         setShowSearch={setShowSearch}
@@ -130,89 +127,84 @@ const SearchScreen = () => {
       {showFilters && (
         <View style={styles.filterContainer}>
           <Text style={styles.filterTitle}>Genre</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <TouchableOpacity
-              style={[
-                styles.genreButton,
-                genreFilter === null && styles.genreButtonActive,
-              ]}
-              onPress={() => setGenreFilter(null)}>
-              <Text
-                style={[
-                  styles.genreButtonText,
-                  genreFilter === null && styles.genreButtonTextActive,
-                ]}>
-                All
-              </Text>
-            </TouchableOpacity>
-            {genres.map(genre => (
+          <FlatList
+            horizontal
+            data={[{id: null, name: 'All'}, ...genres]}
+            keyExtractor={item =>
+              item.id === null ? 'all' : item.id.toString()
+            }
+            showsHorizontalScrollIndicator={false}
+            renderItem={({item}) => (
               <TouchableOpacity
-                key={genre.id}
                 style={[
                   styles.genreButton,
-                  genreFilter === genre.id && styles.genreButtonActive,
+                  genreFilter === item.id && styles.genreButtonActive,
                 ]}
                 onPress={() =>
-                  setGenreFilter(genreFilter === genre.id ? null : genre.id)
+                  setGenreFilter(genreFilter === item.id ? null : item.id)
                 }>
                 <Text
                   style={[
                     styles.genreButtonText,
-                    genreFilter === genre.id && styles.genreButtonTextActive,
+                    genreFilter === item.id && styles.genreButtonTextActive,
                   ]}>
-                  {genre.name}
+                  {item.name}
                 </Text>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
+            )}
+          />
 
           <Text style={styles.filterTitle}>Rating</Text>
-          <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
-            <TouchableOpacity
-              style={[
-                styles.filterOption,
-                ratingFilter === null && styles.selectedFilter,
-              ]}
-              onPress={() => setRatingFilter(null)}>
-              <Text
-                style={[
-                  styles.filterText,
-                  ratingFilter === null && styles.selectedFilterText,
-                ]}>
-                All
-              </Text>
-            </TouchableOpacity>
-            {[5, 6, 7, 8, 9].map(rating => (
-              <TouchableOpacity
-                key={rating}
-                style={[
-                  styles.filterOption,
-                  ratingFilter === rating && styles.selectedFilter,
-                ]}
-                onPress={() =>
-                  setRatingFilter(ratingFilter === rating ? null : rating)
-                }>
-                <Text
+          <FlatList
+            data={[null, 5, 6, 7, 8, 9]}
+            horizontal
+            keyExtractor={(item) =>
+              item === null ? 'all' : item.toString()
+            }
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{paddingVertical: 8}}
+            renderItem={({item}) => {
+              const isSelected = item === ratingFilter;
+              return (
+                <TouchableOpacity
                   style={[
-                    styles.filterText,
-                    ratingFilter === rating && styles.selectedFilterText,
-                  ]}>
-                  {rating}+
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+                    styles.filterOption,
+                    item === null && !ratingFilter && styles.selectedFilter,
+                    isSelected && styles.selectedFilter,
+                  ]}
+                  onPress={() =>
+                    setRatingFilter(item === ratingFilter ? null : item)
+                  }>
+                  <Text
+                    style={[
+                      styles.filterText,
+                      (item === null && !ratingFilter) || isSelected
+                        ? styles.selectedFilterText
+                        : null,
+                    ]}>
+                    {item === null ? 'All' : `${item}+`}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
         </View>
       )}
+
       {searchLoading && (
         <ActivityIndicator style={{marginTop: 20}} size="large" />
       )}
       {!searchLoading && filterLoading && (
         <ActivityIndicator style={{marginTop: 20}} size="large" />
       )}
-      {!searchLoading && !filterLoading && searched && filteredMovies.length === 0 && (
-        <Text style={styles.noResultsText}>Kriterlere uygun film bulunamadı.</Text>
-      )}
+      {!searchLoading &&
+        !filterLoading &&
+        searched &&
+        filteredMovies.length === 0 && (
+          <Text style={styles.noResultsText}>
+            Kriterlere uygun film bulunamadı.
+          </Text>
+        )}
 
       {!searchLoading && !filterLoading && filteredMovies.length > 0 && (
         <FlatList
@@ -240,7 +232,7 @@ const SearchScreen = () => {
 
 const styles = StyleSheet.create({
   screen: {
-    backgroundColor: colors.black,
+    backgroundColor: colors.darkRed,
     flex: 1,
   },
   container: {
@@ -254,12 +246,11 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     borderWidth: 1,
-    borderColor: 'red',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: colors.yellow,
-    color: colors.red,
+    backgroundColor: colors.brightYellow,
+    color: colors.black,
     fontSize: 16,
   },
   filterContainer: {
@@ -277,16 +268,16 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: colors.yellow,
+    backgroundColor: colors.cream,
     marginRight: 8,
     marginBottom: 8,
   },
   genreButtonActive: {
-    backgroundColor: colors.red,
+    backgroundColor:colors.brightYellow ,
     fontWeight: 'bold',
   },
   genreButtonText: {
-    color: colors.red,
+    color: colors.deepGray,
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -298,16 +289,17 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: colors.yellow,
+    backgroundColor: colors.cream,
     marginRight: 8,
     marginBottom: 8,
   },
   selectedFilter: {
-    backgroundColor: colors.red,
+    backgroundColor: colors.brightYellow,
   },
   filterText: {
-    color: colors.red,
+    color: colors.deepGray,
     fontSize: 14,
+    fontWeight:'bold',
   },
   selectedFilterText: {
     color: colors.black,
@@ -316,7 +308,7 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     margin: 8,
-    backgroundColor: colors.darkGrey,
+    backgroundColor: colors.blackishGray,
     borderRadius: 12,
     overflow: 'hidden',
     alignItems: 'center',
@@ -328,13 +320,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: colors.yellow,
+    color: colors.paleYellow,
   },
   noResultsText: {
     textAlign: 'center',
+    color: colors.brightYellow,
     marginTop: 20,
+    fontWeight: 'bold',
     fontSize: 16,
-    color: colors.yellow,
   },
 });
 

@@ -11,6 +11,12 @@ const colors = {
   pink: '#FFC0CB',
   darkGrey:'#1c1c1c',
   darkRed:'#1a0000',
+  lightGray: '#e5e5e5',
+  deepGray: '#2e2e2e',
+  paleYellow: '#F5F5B5',
+  brightYellow: '#ffeb3b',
+  cream: '#f5f0e6',
+  blackishGray: '#2b2b2b',
 };
 
 export default colors;

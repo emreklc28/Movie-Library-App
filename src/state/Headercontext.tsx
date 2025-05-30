@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, {createContext, useContext, useState} from 'react';
 
 type HeaderContextType = {
   title: string;
@@ -12,11 +12,11 @@ const HeaderContext = createContext<HeaderContextType>({
 
 export const useHeader = () => useContext(HeaderContext);
 
-export const HeaderProvider = ({ children }: { children: React.ReactNode }) => {
+export const HeaderProvider = ({children}: {children: React.ReactNode}) => {
   const [title, setTitle] = useState('Movie App');
 
   return (
-    <HeaderContext.Provider value={{ title, setTitle }}>
+    <HeaderContext.Provider value={{title, setTitle}}>
       {children}
     </HeaderContext.Provider>
   );

@@ -1,16 +1,15 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useMemo} from 'react';
 import {
   View,
   Text,
   FlatList,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
   TextInput,
-  ActivityIndicator,
   StatusBar,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import {useFavorites} from '../state/FavContext';
 import {useMovies} from '../state/MovieContext';
@@ -34,20 +33,32 @@ const FavScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const [loading, setLoading] = useState(true);
   const [genreFilter, setGenreFilter] = useState<number | null>(null);
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [searchText, setSearchText] = useState('');
 
-  useEffect(() => {
-    if (favorites && genres) {
-      setLoading(false);
-    }
-  }, [favorites, genres]);
+  const filteredFavorites = useMemo(() => {
+    return favorites.filter(movie => {
+      const genreMatch =
+        genreFilter === null ||
+        (Array.isArray(movie.genre_ids) &&
+          movie.genre_ids.includes(genreFilter));
 
-  if (loading) {
+      const ratingMatch =
+        ratingFilter === null ||
+        (movie.vote_average && movie.vote_average >= ratingFilter);
+
+      const searchMatch = movie.title
+        .toLowerCase()
+        .includes(searchText.toLowerCase());
+
+      return genreMatch && ratingMatch && searchMatch;
+    });
+  }, [favorites, genreFilter, ratingFilter, searchText]);
+
+  if (!favorites || !genres) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#007bff" />
@@ -64,29 +75,13 @@ const FavScreen = () => {
     );
   }
 
-  const filteredFavorites = favorites.filter(movie => {
-    const genreMatch =
-      genreFilter === null ||
-      (Array.isArray(movie.genre_ids) && movie.genre_ids.includes(genreFilter));
-
-    const ratingMatch =
-      ratingFilter === null ||
-      (movie.vote_average && movie.vote_average >= ratingFilter);
-
-    const searchMatch = movie.title
-      .toLowerCase()
-      .includes(searchText.toLowerCase());
-
-    return genreMatch && ratingMatch && searchMatch;
-  });
-
   return (
-    <>
+    <React.Fragment>
       <StatusBar barStyle="light-content" backgroundColor={'#000'} />
       <KeyboardAvoidingView
         style={{flex: 1}}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
         <View style={styles.containerMain}>
           <SearchFilterToggles
             showSearch={showSearchBar}
@@ -110,78 +105,56 @@ const FavScreen = () => {
           {showFilters && (
             <View style={styles.filterContainer}>
               <Text style={styles.filterTitle}>Genre</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <TouchableOpacity
-                  style={[
-                    styles.genreButton,
-                    genreFilter === null && styles.genreButtonActive,
-                  ]}
-                  onPress={() => setGenreFilter(null)}>
-                  <Text
-                    style={[
-                      styles.genreButtonText,
-                      genreFilter === null && styles.genreButtonTextActive,
-                    ]}>
-                    All
-                  </Text>
-                </TouchableOpacity>
-
-                {genres.map(genre => (
+              <FlatList
+                horizontal
+                data={[{id: null, name: 'All'}, ...genres]}
+                keyExtractor={item => item.id?.toString() ?? 'all'}
+                showsHorizontalScrollIndicator={false}
+                renderItem={({item}) => (
                   <TouchableOpacity
-                    key={genre.id}
                     style={[
                       styles.genreButton,
-                      genreFilter === genre.id && styles.genreButtonActive,
+                      genreFilter === item.id && styles.genreButtonActive,
                     ]}
                     onPress={() =>
-                      setGenreFilter(genreFilter === genre.id ? null : genre.id)
+                      setGenreFilter(genreFilter === item.id ? null : item.id)
                     }>
                     <Text
                       style={[
                         styles.genreButtonText,
-                        genreFilter === genre.id &&
+                        genreFilter === item.id &&
                           styles.genreButtonTextActive,
                       ]}>
-                      {genre.name}
+                      {item.name}
                     </Text>
                   </TouchableOpacity>
-                ))}
-              </ScrollView>
+                )}
+              />
 
               <Text style={styles.filterTitle}>Rating</Text>
-              <View style={styles.ratingContainer}>
-                <TouchableOpacity
-                  style={[
-                    styles.filterOption,
-                    ratingFilter === null && styles.selectedFilter,
-                  ]}
-                  onPress={() => setRatingFilter(null)}>
-                  <Text
-                    style={[
-                      ratingFilter === null && styles.selectedFilterText,
-                    ]}>
-                    All
-                  </Text>
-                </TouchableOpacity>
-                {[5, 6, 7, 8, 9].map(rating => (
+              <FlatList
+                horizontal
+                data={[null, 5, 6, 7, 8, 9]}
+                keyExtractor={item => (item === null ? 'all' : item.toString())}
+                showsHorizontalScrollIndicator={false}
+                renderItem={({item}) => (
                   <TouchableOpacity
-                    key={rating}
                     style={[
                       styles.filterOption,
-                      ratingFilter === rating && styles.selectedFilter,
+                      ratingFilter === item && styles.selectedFilter,
                     ]}
                     onPress={() =>
-                      setRatingFilter(ratingFilter === rating ? null : rating)
+                      setRatingFilter(ratingFilter === item ? null : item)
                     }>
                     <Text
                       style={[
-                        ratingFilter === rating && styles.selectedFilterText,
+                        ratingFilter === item && styles.selectedFilterText,
                       ]}>
-                      {rating}+
+                      {item === null ? 'All' : `${item}+`}
                     </Text>
                   </TouchableOpacity>
-                ))}
-              </View>
+                )}
+              />
             </View>
           )}
 
@@ -232,7 +205,7 @@ const FavScreen = () => {
           )}
         </View>
       </KeyboardAvoidingView>
-    </>
+    </React.Fragment>
   );
 };
 
@@ -246,7 +219,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   center: {
-    backgroundColor: colors.red,
+    backgroundColor: colors.paleYellow,
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -257,12 +230,11 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     borderWidth: 1,
-    borderColor: colors.red,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: colors.yellow,
-    color: colors.red,
+    backgroundColor: colors.brightYellow,
+    color: colors.black,
     fontSize: 16,
   },
   filterContainer: {
@@ -279,16 +251,16 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: colors.yellow,
+    backgroundColor: colors.cream,
     marginRight: 8,
     marginBottom: 8,
   },
   genreButtonActive: {
-    backgroundColor: colors.red,
+    backgroundColor: colors.brightYellow,
     fontWeight: 'bold',
   },
   genreButtonText: {
-    color: colors.red,
+    color: colors.deepGray,
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -300,14 +272,13 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: colors.yellow,
+    backgroundColor: colors.cream,
     marginRight: 8,
     marginBottom: 8,
   },
   selectedFilter: {
-    backgroundColor: colors.red,
+    backgroundColor: colors.brightYellow,
   },
-
   selectedFilterText: {
     color: colors.black,
     fontWeight: 'bold',
@@ -336,7 +307,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    color: colors.yellow,
+    color: colors.paleYellow,
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 4,

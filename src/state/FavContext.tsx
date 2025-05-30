@@ -1,6 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { db, auth } from '../firebase/config';
-import { collection, doc, setDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import React, {createContext, useContext, useState, useEffect} from 'react';
+import {db, auth} from '../firebase/config';
+import {
+  collection,
+  doc,
+  setDoc,
+  deleteDoc,
+  onSnapshot,
+} from 'firebase/firestore';
 
 type Movie = {
   id: number;
@@ -24,12 +30,12 @@ const FavContext = createContext<FavContextType>({
   isFavorite: () => false,
 });
 
-export const FavProvider = ({ children }: { children: React.ReactNode }) => {
+export const FavProvider = ({children}: {children: React.ReactNode}) => {
   const [favorites, setFavorites] = useState<Movie[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+    const unsubscribeAuth = auth.onAuthStateChanged(user => {
       if (user) {
         setUserId(user.uid);
       } else {
@@ -41,31 +47,33 @@ export const FavProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    let unsubscribeFirestore: () => void = () => {};
-
-    if (userId) {
-      const favoritesCollectionRef = collection(db, 'users', userId, 'favorites');
-
-      unsubscribeFirestore = onSnapshot(favoritesCollectionRef, (snapshot) => {
-        const initialFavorites: Movie[] = [];
-        snapshot.forEach((doc) => {
-          initialFavorites.push(doc.data() as Movie);
-        });
-        setFavorites(initialFavorites);
-      });
-    } else {
+    if (!userId) {
       setFavorites([]);
+      return;
     }
 
-    return () => unsubscribeFirestore();
+    const favoritesCollectionRef = collection(db, 'users', userId, 'favorites');
+    return onSnapshot(favoritesCollectionRef, snapshot => {
+      const initialFavorites: Movie[] = [];
+      snapshot.forEach(doc => {
+        initialFavorites.push(doc.data() as Movie);
+      });
+      setFavorites(initialFavorites);
+    });
   }, [userId]);
 
   const toggleFavorite = async (movie: Movie) => {
     const userId = auth.currentUser?.uid;
 
     if (userId) {
-      const movieDocRef = doc(db, 'users', userId, 'favorites', String(movie.id));
-      const isCurrentlyFavorite = favorites.some((fav) => fav.id === movie.id);
+      const movieDocRef = doc(
+        db,
+        'users',
+        userId,
+        'favorites',
+        String(movie.id),
+      );
+      const isCurrentlyFavorite = favorites.some(fav => fav.id === movie.id);
 
       try {
         if (isCurrentlyFavorite) {
@@ -80,11 +88,11 @@ export const FavProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const isFavorite = (movieId: number) => {
-    return favorites.some((m) => m.id === movieId);
+    return favorites.some(m => m.id === movieId);
   };
 
   return (
-    <FavContext.Provider value={{ favorites, toggleFavorite, isFavorite }}>
+    <FavContext.Provider value={{favorites, toggleFavorite, isFavorite}}>
       {children}
     </FavContext.Provider>
   );

@@ -1,14 +1,27 @@
-import React, {useEffect} from 'react';
-import {View, Text, Alert, StyleSheet} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  Alert,
+  StyleSheet,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {auth} from '../firebase/config';
 import {useHeader, HeaderProvider} from '../state/Headercontext';
 import Header from '../components/Header';
 import colors from '../theme/colors';
-import CustomButton from '../components/ProfileButtons';
+import ProfileButton from '../components/ProfileButtons';
+import {EmailAuthProvider, reauthenticateWithCredential} from 'firebase/auth';
 
 const ProfileScreenContent = () => {
   const {setTitle} = useHeader();
+
+  const [showPasswordInput, setShowPasswordInput] = useState(false);
+  const [password, setPassword] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     setTitle('Movie Library');
@@ -23,40 +36,81 @@ const ProfileScreenContent = () => {
   };
 
   const handleDeleteAccount = async () => {
+    if (!password) {
+      Alert.alert('Hata', 'Lütfen şifrenizi girin.');
+      return;
+    }
+    setIsDeleting(true);
     const user = auth.currentUser;
-    if (user) {
+
+    if (user && user.email) {
+      const credential = EmailAuthProvider.credential(user.email, password);
+
       try {
+        await reauthenticateWithCredential(user, credential);
         await user.delete();
-        Alert.alert('Hesap Silindi', 'Hesabınız başarıyla silindi.');
-      } catch (error) {
-        Alert.alert('Hata', 'Hesap silinemedi.');
+        Alert.alert('Başarılı', 'Hesabınız silindi.');
+      } catch (error: any) {
+        Alert.alert('Hata', 'Şifre hatalı veya hesap silinemedi.');
       }
     }
+    setIsDeleting(false);
   };
 
   return (
-    <>
+    <React.Fragment>
       <Header />
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.container}
+      >
         <View style={styles.profileHeader}>
           <Ionicons name="person-circle-outline" size={100} color="#fff" />
           <Text style={styles.title}>{auth.currentUser?.email}</Text>
         </View>
 
-        <CustomButton
+        <ProfileButton
           title="Logout"
           iconName="exit-outline"
           onPress={handleLogout}
         />
 
-        <CustomButton
-          title="Delete Account"
-          iconName="trash-outline"
-          onPress={handleDeleteAccount}
-          variant="delete"
-        />
-      </View>
-    </>
+        {!showPasswordInput ? (
+          <ProfileButton
+            title="Delete Account"
+            iconName="trash-outline"
+            onPress={() => setShowPasswordInput(true)}
+            variant="delete"
+          />
+        ) : (
+          <>
+            <TextInput
+              style={styles.input}
+              placeholder="Şifrenizi girin"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+              editable={!isDeleting}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <ProfileButton
+              title={isDeleting ? 'Siliniyor...' : 'Hesabı Sil'}
+              onPress={handleDeleteAccount}
+              variant="delete"
+              style={{opacity: isDeleting ? 0.7 : 1}}
+            />
+            <ProfileButton
+              title="İptal"
+              onPress={() => {
+                setShowPasswordInput(false);
+                setPassword('');
+              }}
+            />
+          </>
+        )}
+      </KeyboardAvoidingView>
+    </React.Fragment>
   );
 };
 
@@ -86,5 +140,14 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '600',
     color: colors.yellow,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 10,
+    marginVertical: 15,
+    backgroundColor: '#fff',
+    color: '#000',
   },
 });

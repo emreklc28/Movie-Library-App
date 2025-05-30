@@ -45,13 +45,13 @@ const styles = StyleSheet.create({
   sideButton: {
     paddingVertical: 12,
     paddingHorizontal: 20,
-    backgroundColor: colors.blue,
+    backgroundColor: colors.lightGray,
     borderRadius: 12,
     alignItems: 'center',
     minWidth: '40%',
   },
   filterToggleText: {
-    color: colors.yellow,
+    color: colors.deepGray,
     fontSize: 16,
     fontWeight: '600',
   },

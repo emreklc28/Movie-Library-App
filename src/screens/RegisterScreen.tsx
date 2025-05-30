@@ -27,7 +27,10 @@ const RegisterScreen = () => {
     }
 
     if (!isValidEmail(email)) {
-      Alert.alert('Hata', 'Lütfen geçerli bir email adresi girin (örneğin: kullanici@ornek.com).');
+      Alert.alert(
+        'Hata',
+        'Lütfen geçerli bir email adresi girin (örneğin: kullanici@ornek.com).',
+      );
       return;
     }
 
@@ -45,12 +48,14 @@ const RegisterScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Kayıt Ol</Text>
       <InputField
         label="Email"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
         placeholder="E-mail adresinizi giriniz!"
+        iconName="mail-outline"
       />
       <InputField
         label="Password"
@@ -59,8 +64,13 @@ const RegisterScreen = () => {
         value={password}
         onChangeText={setPassword}
         keyboardType="default"
+        iconName="lock-closed-outline"
       />
-      <Button title="Register" onPress={handleRegister} />
+      
+      
+      <View style={{ marginTop: 16 }}>
+        <Button title="Register" onPress={handleRegister} />
+      </View>
 
       <View style={styles.loginTextContainer}>
         <Text style={styles.text}>Zaten hesabınız var mı? </Text>
@@ -76,21 +86,31 @@ export default RegisterScreen;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor:colors.black,
+    backgroundColor: colors.darkRed,
     flex: 1,
     justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  title:{
+    fontSize: 32,
+    color: colors.white,
+    fontWeight: 'bold',
+    marginBottom: 24,
+    alignSelf: 'center',
+
   },
   loginTextContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 16,
+    marginTop: 24,
   },
   loginText: {
     color: colors.white,
     fontWeight: 'bold',
+    fontSize: 16,
   },
-  text:{
-    color:colors.red,
-
+  text: {
+    color: colors.red,
+    fontSize: 16,
   },
 });

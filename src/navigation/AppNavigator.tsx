@@ -11,6 +11,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import FavScreen from '../screens/FavScreen';
 import SearchScreen from '../screens/SearchScreen';
 import DetailsScreen from '../screens/DetailsScreen';
+import colors from '../theme/colors';
 
 const RootStack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -40,7 +41,7 @@ function MainTab() {
         tabBarStyle: {
           height: 60,
           paddingBottom: 5,
-          backgroundColor: 'black',
+          backgroundColor: colors.black,
         },
       })}
     >

@@ -1,5 +1,15 @@
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
-import { fetchPopularMovies, fetchSearchMovies, fetchGenreList } from '../api/api';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useMemo,
+} from 'react';
+import {
+  fetchPopularMovies,
+  fetchSearchMovies,
+  fetchGenreList,
+} from '../api/api';
 
 export type Genre = {
   id: number;
@@ -57,7 +67,7 @@ const MovieContext = createContext<MovieContextType>({
   loadMoreSearchResults: () => {},
 });
 
-export const MovieProvider = ({ children }: { children: React.ReactNode }) => {
+export const MovieProvider = ({children}: {children: React.ReactNode}) => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -101,16 +111,16 @@ export const MovieProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    if (page === 1){
+    if (page === 1) {
       return;
     }
-    loadMovies(page).then((newMovies) => {
-      setMovies((prev) => [...prev, ...newMovies]);
+    loadMovies(page).then(newMovies => {
+      setMovies(prev => [...prev, ...newMovies]);
     });
   }, [page]);
 
   const loadMoreMovies = () => {
-    if (!isLoading) setPage((prev) => prev + 1);
+    if (!isLoading) setPage(prev => prev + 1);
   };
 
   const searchMovies = async () => {
@@ -127,25 +137,29 @@ export const MovieProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const loadMoreSearchResults = async () => {
-    if (searchLoading){
+    if (searchLoading) {
       return;
     }
-    if (query.trim().length === 0){
+    if (query.trim().length === 0) {
       return;
     }
 
     setSearchLoading(true);
     const nextPage = searchPage + 1;
     const results = await fetchSearchMovies(query, nextPage);
-    setSearchResults((prev) => [...prev, ...results]);
+    setSearchResults(prev => [...prev, ...results]);
     setSearchPage(nextPage);
     setSearchLoading(false);
   };
 
   const filteredMovies = useMemo(() => {
-    return movies.filter((movie) => {
-      const matchGenre = genreFilter ? movie.genre_ids?.includes(genreFilter) : true;
-      const matchRating = ratingFilter ? (movie.vote_average ?? 0) >= ratingFilter : true;
+    return movies.filter(movie => {
+      const matchGenre = genreFilter
+        ? movie.genre_ids?.includes(genreFilter)
+        : true;
+      const matchRating = ratingFilter
+        ? (movie.vote_average ?? 0) >= ratingFilter
+        : true;
       return matchGenre && matchRating;
     });
   }, [movies, genreFilter, ratingFilter]);
@@ -171,8 +185,7 @@ export const MovieProvider = ({ children }: { children: React.ReactNode }) => {
         filteredMovies,
         searchPage,
         loadMoreSearchResults,
-      }}
-    >
+      }}>
       {children}
     </MovieContext.Provider>
   );

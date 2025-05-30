@@ -6,7 +6,7 @@ import colors from '../theme/colors';
 type ProfileButtonProps = {
   title: string;
   onPress: () => void;
-  iconName: string;
+  iconName?: string;
   variant?: 'logout' | 'delete';
   style?: StyleProp<ViewStyle>;
 };

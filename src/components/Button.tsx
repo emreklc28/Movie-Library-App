@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import {TouchableOpacity, Text, StyleSheet} from 'react-native';
 import colors from '../theme/colors';
 
 type ButtonProps = {
@@ -8,12 +8,11 @@ type ButtonProps = {
   color?: string;
 };
 
-const Button: React.FC<ButtonProps> = ({ title, onPress, color }) => {
+const Button: React.FC<ButtonProps> = ({title, onPress, color}) => {
   return (
     <TouchableOpacity
-      style={[styles.button, { backgroundColor: color || colors.blue }]}
-      onPress={onPress}
-    >
+      style={[styles.button, {backgroundColor: color || colors.blue}]}
+      onPress={onPress}>
       <Text style={styles.buttonText}>{title}</Text>
     </TouchableOpacity>
   );

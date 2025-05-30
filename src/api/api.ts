@@ -48,7 +48,7 @@ export const fetchMovieCast = async (movieId: number) => {
 
 export const fetchSearchMovies = async (query: string, page = 1) => {
   if (!query) {
-  return [];
+    return [];
   }
   try {
     const response = await axios.get(`${BASE_URL}/search/movie`, {
@@ -124,7 +124,6 @@ export const fetchFilteredMovies = async ({
     console.error('Filtrelenmiş filmler alınamadı:', error);
     return [];
   }
-
 };
 export const fetchGenreList = async () => {
   try {
@@ -140,4 +139,3 @@ export const fetchGenreList = async () => {
     return [];
   }
 };
-
