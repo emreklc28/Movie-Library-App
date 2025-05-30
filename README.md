@@ -6,9 +6,12 @@ MovieLibraryApp, React Native kullanılarak geliştirilmiş, kullanıcıların p
 
 ## Görseller
 <p float="left">
-  <img src="https://github.com/emreklc28/MovieLibraryApp/blob/97401623dc6c87c0bac7f4879dba621d6a1e0814/home.png" width="200" />
-  <img src="https://github.com/emreklc28/MovieLibraryApp/blob/97401623dc6c87c0bac7f4879dba621d6a1e0814/search.png" width="200" />
-  <img src="https://github.com/emreklc28/MovieLibraryApp/blob/97401623dc6c87c0bac7f4879dba621d6a1e0814/fav.png" width="200" />
+  <img src="https://github.com/emreklc28/Movie-Library-App/blob/3c5b91d692d63765c5b6c1cdd6d01bfee900c212/login.png" width="200" />
+  <img src="https://github.com/emreklc28/Movie-Library-App/blob/3c5b91d692d63765c5b6c1cdd6d01bfee900c212/home.png" width="200" />
+  <img src="https://github.com/emreklc28/Movie-Library-App/blob/3c5b91d692d63765c5b6c1cdd6d01bfee900c212/search.png" width="200" />
+  <img src="https://github.com/emreklc28/Movie-Library-App/blob/3c5b91d692d63765c5b6c1cdd6d01bfee900c212/favs.png" width="200" />
+  <img src="https://github.com/emreklc28/Movie-Library-App/blob/3c5b91d692d63765c5b6c1cdd6d01bfee900c212/profile.png" width="200" />
+  
 </p>
 
 
