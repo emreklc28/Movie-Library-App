@@ -4,7 +4,7 @@ import colors from '../theme/colors';
 const styles = StyleSheet.create({
   containerMain: {
     flex: 1,
-    backgroundColor: colors,
+    backgroundColor: colors.darkRed,
   },
   listContentContainer: {
     paddingHorizontal: 16,
