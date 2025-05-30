@@ -3,17 +3,17 @@ import {
   View,
   Text,
   FlatList,
-  StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useMovies} from '../state/MovieContext';
-import {useHeader, HeaderProvider} from '../state/Headercontext';
+import {useHeader} from '../state/Headercontext';
 import Header from '../components/Header';
 import DynamicImage from '../state/ImageContext';
 import colors from '../theme/colors';
+import styles from '../styles/HomeStyles';
 
 type RootStackParamList = {
   Details: {movie: any};
@@ -21,8 +21,10 @@ type RootStackParamList = {
 
 const HomeScreen = () => {
   const {movies, isLoading, loadMoreMovies, refreshMovies} = useMovies();
+
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
   const [refreshing, setRefreshing] = useState(false);
   const {setTitle} = useHeader();
 
@@ -98,49 +100,3 @@ const HomeScreen = () => {
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({
-  loader: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.red,
-  },
-  container: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: colors.black,
-  },
-  footerLoader: {
-    marginVertical: 16,
-  },
-  card: {
-    flex: 1,
-    flexDirection: 'row',
-    marginBottom: 20,
-    backgroundColor: colors.darkGrey,
-    borderRadius: 12,
-    overflow: 'hidden',
-    elevation: 4,
-    shadowColor: colors.red,
-    shadowOffset: {width: 0, height: 3},
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-  },
-  info: {
-    flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.paleYellow,
-    marginBottom: 8,
-    flexWrap: 'wrap',
-  },
-  year: {
-    fontSize: 14,
-    color: colors.paleYellow,
-  },
-});
